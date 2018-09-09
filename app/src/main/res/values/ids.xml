@@ -7,4 +7,6 @@
     <item name="remainigTime" type="id" />
     <item name="playButton" type="id" />
     <item name="songsList" type="id" />
+    <item name="titleSong" type="id" />
+    <item name="artistSong" type="id" />
 </resources>

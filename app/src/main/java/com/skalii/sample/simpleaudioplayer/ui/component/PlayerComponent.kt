@@ -9,12 +9,12 @@ import com.skalii.sample.simpleaudioplayer.R
 import com.skalii.sample.simpleaudioplayer.ui.activity.PlayerActivity
 
 import org.jetbrains.anko.*
-import org.jetbrains.anko.appcompat.v7.tintedButton
-import org.jetbrains.anko.custom.style
 
 
 class PlayerComponent : AnkoComponent<PlayerActivity> {
 
+    lateinit var titleSong: TextView
+    lateinit var artistSong: TextView
     lateinit var cover: ImageView
     lateinit var progressBar: SeekBar
     lateinit var totalTime: TextView
@@ -36,21 +36,39 @@ class PlayerComponent : AnkoComponent<PlayerActivity> {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER_HORIZONTAL
 
+                    titleSong =
+                            textView {
+                                id = R.id.titleSong
+                            }.lparams {
+                                width = wrapContent
+                                height = wrapContent
+                                topMargin = dip(10)
+                            }
+
+                    artistSong =
+                            textView {
+                                id = R.id.artistSong
+                            }.lparams {
+                                width = wrapContent
+                                height = wrapContent
+                                topMargin = dip(5)
+                            }
+
                     cover =
                             imageView {
                                 id = R.id.cover
                                 imageResource = R.drawable.empty_cover
                             }.lparams {
-                                width = dip(320)
-                                height = dip(320)
-                                topMargin = dip(50)
+                                width = dip(350)
+                                height = dip(350)
+                                topMargin = dip(5)
                             }
 
                     progressBar =
                             seekBar {
                                 id = R.id.progressBar
                             }.lparams {
-                                width = dip(350)
+                                width = dip(382)
                                 height = wrapContent
                                 topMargin = dip(-10)
                             }
@@ -81,7 +99,7 @@ class PlayerComponent : AnkoComponent<PlayerActivity> {
                                 width = wrapContent
                                 height = wrapContent
                                 topMargin = dip(-20)
-                                leftMargin = dip(140)
+                                rightMargin = dip(-150)
                             }
 
                     songsList =

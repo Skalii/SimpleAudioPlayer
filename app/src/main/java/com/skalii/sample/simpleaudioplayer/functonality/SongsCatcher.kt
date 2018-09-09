@@ -66,14 +66,14 @@ class SongsCatcher {
     fun getMusic(contentResolver: ContentResolver) {
         val songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         songCursor = contentResolver.query(songUri, null, null, null, null)
-        if (songCursor != null && songCursor.moveToFirst()) {
+        if (songCursor.moveToFirst()) {
             with(songCursor) {
                 do {
                     arrayList.add(
                             "${getString(getColumnIndex(MediaStore.Audio.Media.TITLE))} - " +
                                     "${AudioPlayer.timeToString(getInt(getColumnIndex(MediaStore.Audio.Media.DURATION)))}\n" +
                                     "${getString(getColumnIndex(MediaStore.Audio.Media.ARTIST))} -  " +
-                                    "${getString(getColumnIndex(MediaStore.Audio.Media.ALBUM))}"
+                                    getString(getColumnIndex(MediaStore.Audio.Media.ALBUM))
                     )
                 } while (moveToNext())
                 songCursor.moveToPosition(0)
@@ -98,7 +98,7 @@ class SongsCatcher {
             onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
                 songCursor.moveToPosition(position)
                 currentSongUri = Uri.fromFile(File(songCursor.getString(1)))
-                audioPlayer.nextSong(context, currentSongUri)
+                audioPlayer.nextSong(currentSongUri)
 
                 val mmr = MediaMetadataRetriever()
                 mmr.setDataSource(context, currentSongUri)
@@ -106,11 +106,11 @@ class SongsCatcher {
 
                 if (data != null) {
                     val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-                    audioPlayer.cover.setImageBitmap(bitmap)
+                    audioPlayer.components.cover.setImageBitmap(bitmap)
                 } else {
-                    audioPlayer.cover.setImageResource(R.drawable.empty_cover)
+                    audioPlayer.components.cover.setImageResource(R.drawable.empty_cover)
                 }
-                audioPlayer.cover.adjustViewBounds = true
+                audioPlayer.components.cover.adjustViewBounds = true
             }
         }
 

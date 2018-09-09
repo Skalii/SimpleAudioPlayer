@@ -19,31 +19,26 @@ class PlayerActivity : AppCompatActivity() {
 
     private val songsCatcher = SongsCatcher()
     private val components = PlayerComponent()
-    private lateinit var audioPlayer: AudioPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        with(components) {
-            setContentView(this@PlayerActivity)
-            audioPlayer = AudioPlayer(
-                    this@PlayerActivity,
-                    progressBar,
-                    totalTime,
-                    elapsedTime,
-                    reminderTime,
-                    playButton,
-                    cover,
-                    songsCatcher.also {
-                        it.checkPermission(
-                                this@PlayerActivity,
-                                this@PlayerActivity,
-                                components.songsList
-                        )
-                    }.currentSongUri
-            )
+        components.setContentView(this)
+        songsCatcher.audioPlayer = AudioPlayer(
+                this,
+                components,
+                songsCatcher.also {
+                    it.checkPermission(
+                            this,
+                            this,
+                            components.songsList
+                    )
+                }.currentSongUri,
+                songsCatcher.songCursor
+        ).also {
+            it.create()
         }
-        songsCatcher.audioPlayer = audioPlayer
     }
+
     override fun onRequestPermissionsResult(
             requestCode: Int,
             permissions: Array<out String>,

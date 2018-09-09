@@ -3,46 +3,62 @@ package com.skalii.sample.simpleaudioplayer.functonality
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.database.Cursor
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
 import android.os.Message
-import android.widget.ImageButton
-import android.widget.ImageView
+import android.provider.MediaStore
 import android.widget.SeekBar
-import android.widget.TextView
 
 import com.skalii.sample.simpleaudioplayer.R
+import com.skalii.sample.simpleaudioplayer.ui.component.PlayerComponent
+
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 
 class AudioPlayer(
         private val context: Context,
-        private val progressBar: SeekBar,
-        private val totalTime: TextView,
-        private val elapsedTime: TextView,
-        private val remainderTime: TextView,
-        private val playButton: ImageButton,
-        var cover: ImageView,
-        currentSongUri: Uri
+        val components: PlayerComponent,
+        var currentSongUri: Uri,
+        var songCursor: Cursor
 ) {
 
-    var mediaPlayer = MediaPlayer.create(context, currentSongUri)
+    lateinit var mediaPlayer: MediaPlayer
     private lateinit var handler: Handler
 
-
     init {
+        components.playButton.onClick { playbackControl() }
+    }
+
+    fun create(currentSongUri: Uri = this.currentSongUri) {
+        mediaPlayer = MediaPlayer.create(context, currentSongUri)
         setBar()
         setTexts()
-        playButton.onClick { playbackControl() }
     }
+
+    fun nextSong(currentSongUri: Uri) {
+        mediaPlayer.stop()
+        create(currentSongUri)
+        playbackControl()
+        mediaPlayer.start()
+    }
+
+    private fun playbackControl() =
+            if (!mediaPlayer.isPlaying) {
+                mediaPlayer.start()
+                components.playButton.imageResource = R.drawable.ic_pause_circle_filled_black_24dp
+            } else {
+                mediaPlayer.pause()
+                components.playButton.imageResource = R.drawable.ic_play_circle_filled_black_24dp
+            }
 
     private fun setBar() =
             with(mediaPlayer) {
                 seekTo(0)
                 setVolume(1F, 1F)
-                with(progressBar) {
+                with(components.progressBar) {
                     max = duration
                     setOnSeekBarChangeListener(
                             object : SeekBar.OnSeekBarChangeListener {
@@ -64,14 +80,18 @@ class AudioPlayer(
             }
 
     private fun setTexts() {
+        components.titleSong.text =
+                songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+        components.artistSong.text =
+                songCursor.getString(songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
         handler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
                 val currentTime = msg.what
-                progressBar.progress = currentTime
-                totalTime.text = timeToString(mediaPlayer.duration)
-                elapsedTime.text = timeToString(currentTime)
-                remainderTime.text = timeToString(mediaPlayer.duration - currentTime)
+                components.progressBar.progress = currentTime
+                components.totalTime.text = timeToString(mediaPlayer.duration)
+                components.elapsedTime.text = timeToString(currentTime)
+                components.reminderTime.text = timeToString(mediaPlayer.duration - currentTime)
             }
         }
         Thread(Runnable {
@@ -85,27 +105,6 @@ class AudioPlayer(
                 }
             }
         }).start()
-    }
-
-    private fun playbackControl() =
-            if (!mediaPlayer.isPlaying) {
-                mediaPlayer.start()
-                playButton.imageResource = R.drawable.ic_pause_circle_filled_black_24dp
-            } else {
-                mediaPlayer.pause()
-                playButton.imageResource = R.drawable.ic_play_circle_filled_black_24dp
-            }
-
-    fun nextSong(
-            context: Context,
-            currentSongUri: Uri
-    ) {
-        mediaPlayer.stop()
-        mediaPlayer = MediaPlayer.create(context, currentSongUri)
-        setBar()
-        setTexts()
-        playbackControl()
-        mediaPlayer.start()
     }
 
     companion object {
