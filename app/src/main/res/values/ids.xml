@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="cover" type="id" />
+    <item name="progressBar" type="id" />
+    <item name="elapsedTime" type="id" />
+    <item name="totalTime" type="id" />
+    <item name="remainigTime" type="id" />
+    <item name="playButton" type="id" />
+    <item name="songsList" type="id" />
+</resources>
